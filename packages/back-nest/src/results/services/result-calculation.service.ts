@@ -13,20 +13,20 @@ export class ResultCalculationService {
   }
 
   getCPM(code: string, timeMS: number): number {
+    if (timeMS <= 0) return 0;
+
     const timeSeconds = timeMS / 1000;
     const strippedCode = Challenge.getStrippedCode(code);
-    const cps = strippedCode.length / timeSeconds;
-    const cpm = cps * 60;
-    const words = strippedCode.trim().split(' ');
-    if (words.length === 0) { // Avoid division by zero
+
+    if (strippedCode.length === 0) return 0;
+
+    const cpm = (strippedCode.length / timeSeconds) * 60;
+    const wpm = cpm / 5;
+
+    if (wpm >= 300) {
       return 0;
     }
-    const totalWordLength = words.reduce((sum, word) => sum + word.length, 0);
-    const avgWordLength = totalWordLength / words.length;
-    const wpm = cpm / avgWordLength;
-    if (wpm > 300) { // Abitrary value, change as needed, if cpm is greater they are most likely using an automation program
-      return 0; // Simply give them no score 
-    }
+
     return Math.floor(cpm);
   }
 
